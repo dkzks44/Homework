@@ -1,3 +1,12 @@
+from pymongo import MongoClient  # pymongo를 임포트 하기(패키지 인스톨 먼저 해야겠죠?)
+
+client = MongoClient('localhost', 27017)  # mongoDB는 27017 포트로 돌아갑니다.
+db = client.dbsparta
+
+import requests
+from bs4 import BeautifulSoup
+
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -18,10 +27,16 @@ songs = soup.select('#body-content > div.newest-list > div > table > tbody > tr'
     # body-content > div.newest-list > div > table > tbody > tr:nth-child(1) > td.info > a.title.ellipsis
     #body-content > div.newest-list > div > table > tbody > tr:nth-child(1) > td.info > a.artist.ellipsis
 for song in songs:
-    song_rank = song.select_one('td.number')
-    a_title = song.select_one('td.info > a.title.ellipsis')
-    singer = song.select_one('td.info > a.artist.ellipsis')
+    song_rank = song.select_one('td.number').text[0:2].strip()
+    a_title = song.select_one('td.info > a.title.ellipsis').text.strip()
+    singer = song.select_one('td.info > a.artist.ellipsis').text
     if song is not None :
-        print(song_rank.text[0:2].strip(), a_title.text.strip(), singer.text)
+        print(song_rank, a_title, singer)
 
+    doc = {
+        'rank': song_rank,
+        'title': a_title,
+        'singer': singer
+    }
 
+    db.genie.insert_one(doc)
