@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <title>복권 신청 페이지</title>
+        <style>
+            body {
+                background-image: url("https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Fblog%2F170C24144A791F204F");
+            }
+
+            * {
+                font-family: 'Amatic SC', cursive;
+                font-family: 'Merriweather Sans', sans-serif;
+            }
+
+            .present {
+                width: 800px;
+                margin: auto;
+                background-color: white;
+            }
+
+            .wrap {
+                width: 700px;
+                margin: auto;
+
+            }
+
+            .input-group {
+                Width: 700px;
+            }
+
+            .btn btn-primar {
+                align: center;
+            }
+
+            .font-color {
+                color: #ff0000;
+            }
+
+            .textblue {
+                color: blue;
+            }
+
+            .payment {
+                color: black;
+            }
+
+        </style>
+        <script>
+
+            $(document).ready(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "https://api.manana.kr/exchange/rate.json",
+                    data: {},
+                    success: function (response) {
+                        let nowRate = response[1]['rate'];
+                        $('#rate-box').text(nowRate);
+                    }
+                })
+                order_listing();
+            });
+
+            function order_listing() {
+                $.ajax({
+                    type: "GET",
+                    url: "/order",
+                    data: {},
+                    success: function (response) {
+                        let orders = response['orders'];
+                        for (let i = 0; i < orders.length; i++) {
+                            let name = orders[i]['name'];
+                            let count = orders[i]['count'];
+                            let address = orders[i]['address'];
+                            let phone = orders[i]['phone'];
+
+                            let temp_html = `<tr>
+                                            <th scope="row">${name}</th>
+                                            <td>${count}</td>
+                                            <td>${address}</td>
+                                            <td>${phone}</td>
+                                        </tr>`
+                            $('#order-list-box').append(temp_html);
+                        }
+                    }
+                })
+            }
+
+            function typing() {
+                let name = $('#order-name').val();
+                let count = $('#order-count').val();
+                let address = $('#order-address').val();
+                let phone = $('#order-phone').val();
+
+                if (name == '') {
+                    alert('이름을 입력하세요');
+                } else if (count == '-- 수량을 선택하세요 --') {
+                    alert('수량을 입력하세요');
+                } else if (address == '') {
+                    alert('주소를 입력하세요');
+                } else if (phone == '') {
+                    alert('전화번호를 입력하세요');
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/order",
+                        data: {'name_give': name, 'count_give': count, 'address_give': address, 'phone_give': phone},
+                        success: function (response) {
+                            if (response["result"] == "success") {
+                                alert(response["msg"]);
+                                window.location.reload();
+                            }
+                        }
+                    })
+                }
+            }
+        </script>
+    </head>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Merriweather+Sans:ital@1&display=swap"
+          rel="stylesheet">
+    <body>
+        <div class="present">
+            <div class="wrap">
+                <div style="width:700px; height: 500px; overflow:hidden">
+                    <img src="https://img.huffingtonpost.com/asset/5bc68e4e240000170257944c.jpeg?ops=scalefit_630_noupscale"
+                         style="width: 700px; height: 500px; padding: 10px;">
+                </div>
+                <div style="float:left"><h2>복권을 추첨합니다</h2></div>
+                <br style="float:left">가격은 1000원 / 개</br>
+                <p class="textblue">실시간 환율: <span id="rate-box">1,000</span> 원</p>
+                <p>
+                    복권을 추첨합니다! 1등부터 5등까지 다양한 선물이 준비되어 있어요! 선착순 1000개만 구매 가능합니다.
+                </p>
+
+                <p class="font-color">
+                    * 인당 최대 3매까지 구매가 가능합니다.
+                </p>
+                <p class="font-color">
+                    * 입력하신 개인정보는 배송지와 수령인 확인을 위해만 사용됩니다.
+                </p>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="ee">구매자 이름</span>
+                    </div>
+                    <input id="order-name" type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default">
+                </div>
+                <a class="payment"
+                   href="http://localhost:63342/week01.html/Homework/%EA%B2%B0%EC%A0%9C%ED%8E%98%EC%9D%B4%EC%A7%80.html?_ijt=2ec0moq51thbi2bai0of9tlgum"></a>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">수량</label>
+                    </div>
+                    <select id="order-count" class="custom-select" id="inputGroupSelect01">
+                        <option selected>-- 수량을 선택하세요 --</option>
+                        <option value="1">한 개</option>
+                        <option value="2">두 개</option>
+                        <option value="3">세 개</option>
+                    </select>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="add">주소</span>
+                    </div>
+                    <input id="order-address" type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="num">전화번호</span>
+                    </div>
+                    <input id="order-phone" type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div style="text-align:center">
+                    <button onclick="typing()" type="button" class="btn btn-primary">주문하기</button>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">이름</th>
+                        <th scope="col">수량</th>
+                        <th scope="col">주소</th>
+                        <th scope="col">전화번호</th>
+                    </tr>
+                    </thead>
+                    <tbody id="order-list-box">
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </body>
+</html>
